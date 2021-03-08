@@ -5,33 +5,35 @@ class Product:
         self.price = price
         self.qty = qty
 
-class Money:
-    def __init__(self, value):
-        self.value = value
-
-    def changeValue(self, newVal): 
-        self.value = newVal
-
-
 class VendingMachine:
       def __init__(self, products):
             self.products = products
             self.inserted_money = 0
 
       def insert_money(self, money):
-            self.inserted_money += money
+            self.inserted_money = money
 
       def buy(self, raw_product_code):
+            if len(raw_product_code) == " ":
+                print("Product code is empty!")
+                return
             product_code = int(raw_product_code)
             change = self.inserted_money
-            for product in self.products:
+            for i, product in enumerate(self.products):
                 if product.code == product_code and change >= product.price:
+                    if product.qty == 0:
+                        print("No stock available for the product.")
+                        return
+                    self.products[i].qty -= 1
                     change = change - product.price
                     print("You successfully ordered product code: {}".format(product_code))
                     print("Your change is: P{}".format(change))
                     print('-'*50)
-            if change < product.price:
-                print("Insufficient balance! Try again!")
+                    break
+            if change == self.inserted_money:
+                print("Product not found!")
+            elif change < product.price:
+                print("Insufficient balance!")
 
       def list_products(self):
             print("AVAILABLE PRODUCTS: ")
@@ -64,9 +66,10 @@ def main():
         print('-'*50)
         code = input("Enter the product code: ")
         print('-'*50)
-        vending_machine.buy(code)
         if code == '0':
             print('-'*50)
             print("Closing Vend-O-Matic...")
             running = False
+        else:
+            vending_machine.buy(code)
 main()
